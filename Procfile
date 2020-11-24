@@ -1,1 +1,1 @@
-web: gunicorn amamarket.wsgi
+web: gunicorn inventario.wsgi
