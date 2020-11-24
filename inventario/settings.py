@@ -14,7 +14,8 @@ from pathlib import Path
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = Path(__file__).resolve().parent.parent original
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 # Quick-start development settings - unsuitable for production
@@ -129,10 +130,16 @@ STATIC_URL = '/static/'
 #
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 #
-STATIC_ROOT = os.path.join(PROJECT_ROOT+STATIC_URL)
-STATICFILES_DIRS = [PROJECT_ROOT,'static',"static/images/upload/"]
+# original STATIC_ROOT = os.path.join(PROJECT_ROOT+STATIC_URL)
+STATIC_ROOT = os.path.normpath(os.path.join(BASE_DIR, 'static'))
+# oriinal STATICFILES_DIRS = [PROJECT_ROOT,'static',"static/images/upload/"]
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static/images/upload/'),
+)
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'static/images/upload')
 MEDIA_URL = PROJECT_ROOT+'/static/images/upload/'
+
+
 
 
 STATICFILES_FINDERS=[
