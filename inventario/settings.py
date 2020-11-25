@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SECRET_KEY = 'cpny$7u#mrpufw&pso4*@!v19098%f$ry3cnbj*#6h1q2wu=f%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1','*']
 
@@ -86,6 +86,11 @@ DATABASES = {
         'PASSWORD':'6ebea08b88474fcfac14a3fb2de2df025bae6fcb73cd57910cb2e7c01f4e9319',
         'HOST': 'ec2-35-168-77-215.compute-1.amazonaws.com',
         'PORT': 5432,
+        # 'NAME': 'amamarket',
+        # 'USER': 'postgres',
+        # 'PASSWORD':'21098026',
+        # 'HOST': '127.0.0.1',
+        # 'PORT': 5432,
         # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }

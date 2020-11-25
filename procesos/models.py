@@ -5,6 +5,10 @@ from django.dispatch import receiver
 
 
 # Create your models here.
+class AvailProductManager(models.Manager):
+    def get_query_set(self):
+        return super(Product, self).get_query_set().filter(visible=True)
+
 
 class Product(models.Model):
     # __cate=((1,_('Viveres')),(2,_('Frigorifico')),(3,_('Enlatados')),(4,_('Charcuteria')),(5,_('Carnes')),(6,_('Personales')),(7,_('Chucherias')))
@@ -19,6 +23,8 @@ class Product(models.Model):
     # category=models.PositiveSmallIntegerField(choices=__cate,help_text="Seleccione una categoria del producto")
     visible = models.BooleanField(default=False)
     create_at=models.DateTimeField(auto_now_add=True,null=True)
+    avail = AvailProductManager()
+    objects = models.Manager()
     def image_tag(self):
         return mark_safe('<img src="/static/images/upload/%s" style="width: 45px; height:45px;" />' % self.picture.name)
     image_tag.short_description = 'Image'
@@ -39,17 +45,22 @@ class Shopping(models.Model):#compra
     product=models.ManyToManyField(Product, related_name='seleccion_products')
     cantidad=models.CharField(default=0,max_length=500,help_text="cantidad por producto separado por coma")
     monto=models.CharField(max_length=1000,help_text="Precio de la venta en $")
+    credito=models.BooleanField(default=False)
+    pagado=models.BooleanField(default=False)
     create_at=models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.name
     class Meta:
         verbose_name_plural = "Compras"
 
+
+
 @receiver(m2m_changed, sender=Shopping.product.through)
 def update_stock(sender, instance, **kwargs):
     import ast
     action = kwargs.pop('action', None)
     action = action.split('_')
+    monto = 0
     if action[0] == 'post':
         if isinstance(instance.cantidad,int):
             cantidades = instance.cantidad
@@ -58,9 +69,20 @@ def update_stock(sender, instance, **kwargs):
         for index,value in enumerate(instance.product.all()):
             c = Product.objects.get(id=value.id)
             if isinstance(cantidades,int):
-                c.cant = c.cant - cantidades
+                if c.cant >1:
+                    c.cant = c.cant - cantidades
+                    monto = monto+(c.price * cantidades)
+                else:
+                    c.visible=False
             elif isinstance(cantidades,tuple):
-                c.cant = c.cant - cantidades[index]
+                if c.cant > 1:
+                    c.cant = c.cant - cantidades[index]
+                    monto = monto+(c.price * cantidades[index])
+                else:
+                    c.visible=False
+
             else:
                 pass
+            instance.monto=monto
+            instance.save()
             c.save()
